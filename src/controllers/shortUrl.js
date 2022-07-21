@@ -93,3 +93,4 @@ const getUrl = async function (req, res) {
 
 
 module.exports = { createShortUrl, getUrl }
+
