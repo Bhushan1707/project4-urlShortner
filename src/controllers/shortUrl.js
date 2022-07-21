@@ -33,19 +33,18 @@ const createShortUrl = async function (req, res) {
     try {
 
         const longUrl = req.body.longUrl
-        // let urlData = await GET_ASYNC(longUrl)
-        // console.log(urlData)
-        // if(urlData){
-        //   let obj=JSON.parse(urlData) //convert string data into json format because we need result in json format
-        //   // console.log(obj.longUrl)
-          
-        //   return res.status(200).send({status:true,data:obj})
-        // }else{
-
         if (Object.keys(req.body).length == 0) return res.status(400).send({ status: false, message: "Field cannot be empty" })
-
+        let urlData = await GET_ASYNC(longUrl)
+        // console.log(urlData)
+        if(urlData){
+          let obj=JSON.parse(urlData) //convert string data into json format because we need result in json format
+          // console.log(obj.longUrl)
+          
+          return res.status(200).send({status:true,data:obj})
+        }else{
+          
         const existingURL= await urlModel.findOne({longUrl:longUrl}).select({longUrl:1,shortUrl:1,urlCode:1,_id:0})
-        // await SET_ASYNC(longUrl, JSON.stringify(existingURL))
+        
         if (existingURL) return res.status(200).send({status:true,data:existingURL})
 
         if (!linkCheck.test(longUrl)) return res.status(400).send({ status: false, message: "Invalid URL. Please enter valid URL" })
@@ -65,6 +64,8 @@ const createShortUrl = async function (req, res) {
             longUrl: saveData.longUrl,
             shortUrl: saveData.shortUrl,
             urlCode: saveData.urlCode}
+
+            await SET_ASYNC(longUrl, JSON.stringify(resData))
             
             // console.log(longUrl)
             
@@ -73,7 +74,7 @@ const createShortUrl = async function (req, res) {
         return res.status(201).send({ status: true, data: resData })
         
 
-        // }
+        }
 
     } catch (err) {
         return res.status(500).send({ status: false, error: err.message })
