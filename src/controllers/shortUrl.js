@@ -1,7 +1,7 @@
 const shortid = require('shortid');
 const urlModel = require("../model/urlModel")
-const server = require("../index")
 const redis = require("redis");
+var validUrl = require('valid-url')
 
 const { promisify } = require("util");
 
@@ -47,13 +47,15 @@ const createShortUrl = async function (req, res) {
         
         if (existingURL) return res.status(200).send({status:true,data:existingURL})
 
-        if (!linkCheck.test(longUrl)) return res.status(400).send({ status: false, message: "Invalid URL. Please enter valid URL" })
+        // if (!linkCheck.test(longUrl)) 
+        if (!validUrl.isUri(longUrl))
+        return res.status(400).send({ status: false, message: "Invalid URL. Please enter valid URL" })
 
         const urlCode = shortid.generate()
 
-        let port = server.serverDetails.runningPort
+        // let port = server.serverDetails.runningPort
 
-        const shortUrl = `http://localhost:${port}/${urlCode}`
+        const shortUrl = `http://localhost:3000/${urlCode}`
 
         const data = { longUrl, shortUrl, urlCode } 
 
